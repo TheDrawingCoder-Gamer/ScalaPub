@@ -2,46 +2,43 @@ package scalapub.activity
 
 import java.net.URL
 
-sealed trait Text {
-  def str(lang: String): Option[String]
-  def strOrDefault(lang: String): String
-}
-case class LiteralText(literal: String, lang: String = "en") extends Text {
-  def str(lang: String): Option[String] = 
-    Option.when(lang == this.lang)(literal)
-  def strOrDefault(foo: String): String = literal
-}
-
-case class TranslatableText(langMap: Map[String, String], defaultLang: String = "en") extends Text {
-  def str(lang: String): Option[String] =
-    Option.when(langMap.exists(lang))(langMap(lang))
-  def strOrDefault(lang: String): String =
-    str(lang).getOrElse(langMap(defaultLang))
-}
-
 enum PubType {
   case Object
   case Link
   case Activity
   case Person
+  case Actor
   case Note
+  case Follow
+  case Like
 }
-trait ABase {
-  val id: Option[ABase]
+
+sealed trait Text {
+  def translate(lang: String): String
+}
+case class TranslatableText(langMap: Map[String, String], default: String = "en") {
+  def translate(lang: String): String =
+    Option.when(langMap.exists(lang))(langMap(lang)).getOrElse(langMap(default))
+}
+case class LiteralText(literal: String) {
+  def translate(lang: String): String = literal
+}
+sealed trait PubBase {
+  val id: Option[URL]
   val name: Option[Text]
   val `type`: PubType
-
 }
-case class AObject(id: Option[ABase], name: Option[Text], to: Option[List[String]]) extends ABase {
+sealed case class PubObject(id: Option[URL], name: Option[Text], to: Option[List[String]], content: Option[Text]) extends PubBase {
   override val `type` = PubType.Object
-
 }
 
-case class ALink(href: URL, rel: Option[List[String]], mediaType: Option[String], hreflang: Option[String], height: Option[Int], width: Option[Int], preview: Option[ABase]) extends ABase {
-  override val `type` = PubType.Link
+sealed case class PubNote(id: Option[URL], name: Option[Text], to: Option[List[String]], content: Option[Text]) extends PubObject(id, name, to, content) {
+  override val `type` = PubType.Note
 }
 
-def LinkURL(href: URL) = ALink(href, None, None, None, None, None, None)
 
-case class PubActivity(id: Option[ABase]
+
+
+
+
 
