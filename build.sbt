@@ -10,5 +10,7 @@ lazy val root = project
 
     libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test,
     libraryDependencies += "org.typelevel" %% "cats-core" % "2.9.0",
-    libraryDependencies ++= Seq("circe-core", "circe-generic", "circe-parser").map("io.circe" %% _ %% circeVersion)
+    libraryDependencies ++= Seq("circe-core", "circe-generic", "circe-parser").map("io.circe" %% _ % circeVersion),
+    libraryDependencies += "com.apicatalog" % "titanium-json-ld" % "1.3.2",
+    libraryDependencies += "org.glassfish" % "jakarta.json" % "2.0.1"
   )
